@@ -10,8 +10,8 @@ var Game = function Game() {
 
   // Create Players
   this.players = [];
-  var playerOne = new Player(this, gameSize, gameSize.x - 8, { up: 38, down: 40, shoot: 37});
-  var playerTwo = new Player(this, gameSize, 8, { up: 87, down: 83, shoot: 68});
+  var playerOne = new Player(this, gameSize, gameSize.x - 8, { up: 38, down: 40, shoot: 37}, 'right');
+  var playerTwo = new Player(this, gameSize, 8, { up: 87, down: 83, shoot: 68}, 'left');
   this.players = this.players.concat(playerOne, playerTwo);
 
   // Create Boxes
@@ -19,6 +19,9 @@ var Game = function Game() {
   for (i = 8; i < gameSize.y; i = i + 16) {
     this.boxes.push(new Box(this, gameSize, i));
   }
+
+  // Weapons
+  this.weapons = [];
 
   //Tick
   var tick = function tick() {
@@ -33,10 +36,15 @@ var Game = function Game() {
 
 Game.prototype.update = function update() {
   var _this = this;
+  var i;
 
   // Call update on every body
-  for (var i = 0; i < this.players.length; i++) {
+  for (i = 0; i < this.players.length; i++) {
     this.players[i].update();
+  }
+
+  for (i = 0; i < this.weapons.length; i++) {
+    this.weapons[i].update(this.weapons, i);
   }
 };
 
@@ -55,4 +63,13 @@ Game.prototype.draw = function draw(screen, gameSize) {
   for (i = 0; i < this.boxes.length; i++) {
     drawRect(screen, this.boxes[i]);
   }
+
+  // Draw weapons
+  for (i = 0; i < this.weapons.length; i++) {
+    drawRect(screen, this.weapons[i]);
+  }
+};
+
+Game.prototype.addWeapon = function(weapon) {
+  this.weapons.push(weapon);
 };

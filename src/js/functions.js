@@ -24,6 +24,10 @@ var Keyboarder = function Keyboarder() {
     return keyState[keyCode] === true;
   };
 
+  this.isUp = function isUp(keyCode) {
+    return keyState[keyCode] === false;
+  };
+
   // Handy constants that give keyCodes human-readable names.
   this.KEYS = { LEFT: 37, UP: 38, DOWN: 40, W: 87, S: 83, D: 68 };
 };
@@ -33,11 +37,11 @@ var Keyboarder = function Keyboarder() {
 
 // **drawRect()** draws passed body as a rectangle to `screen`, the drawing context.
 var drawRect = function drawRect(screen, body) {
-  screen.fillStyle = '#ff00ff';
+  screen.fillStyle = '#000000';
   screen.fillRect(body.center.x - body.size.x / 2, body.center.y - body.size.y / 2,
                   body.size.x, body.size.y);
 
-  screen.strokeStyle = '#00ff00';
+  screen.strokeStyle = '#ffffff';
   screen.strokeRect(body.center.x - body.size.x / 2, body.center.y - body.size.y / 2,
                   body.size.x, body.size.y);
 };

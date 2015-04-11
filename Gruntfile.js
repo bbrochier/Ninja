@@ -12,6 +12,7 @@ module.exports = function(grunt) {
               'src/js/game.js',
               'src/js/player.js',
               'src/js/box.js',
+              'src/js/weapon.js',
               'src/js/functions.js',
               'src/js/init.js'
             ],
