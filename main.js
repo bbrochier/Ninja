@@ -10,7 +10,15 @@ var Game = function Game() {
   var screen = canvas.getContext('2d');
   var gameSize = { x: canvas.width, y: canvas.height };
   var _this = this;
+  var j = 0;
   var i;
+
+  // Timer
+  this.gameTime = 9 * 1000; /* miliseconds */
+  this.startTime = new Date().getTime();
+  this.currentTime = this.startTime;
+  this.remainTime = this.gameTime;
+  this.endTime = this.startTime + this.gameTime;
 
   // Create Players
   this.players = [];
@@ -21,7 +29,14 @@ var Game = function Game() {
   // Create Boxes
   this.boxes = [];
   for (i = 8; i < gameSize.y; i = i + 16) {
-    this.boxes.push(new Box(this, gameSize, i));
+    if (j === 0) {
+      this.boxes.push(new Box(this, gameSize, i, 'rock', false));
+      j = 8;
+    } else {
+      this.boxes.push(new Box(this, gameSize, i, 'bomb', true));
+    }
+
+    j--;
   }
 
   // Weapons
@@ -31,16 +46,19 @@ var Game = function Game() {
   var tick = function tick() {
     _this.update();
     _this.draw(screen, gameSize);
+    _this.updateScore(gameSize);
+
     requestAnimationFrame(tick);
   };
 
   tick();
-
 };
 
 Game.prototype.update = function update() {
   var _this = this;
   var i;
+  this.players[0].score = 0;
+  this.players[1].score = 0;
 
   // Call update on every body
   for (i = 0; i < this.players.length; i++) {
@@ -48,7 +66,33 @@ Game.prototype.update = function update() {
   }
 
   for (i = 0; i < this.weapons.length; i++) {
-    this.weapons[i].update(this.weapons, i);
+    this.weapons[i].update(this.weapons, i, this.boxes);
+  }
+
+  // UpdateTime
+  this.currentTime = new Date().getTime();
+  if (this.remainTime > 0) {
+    this.remainTime = this.endTime - this.currentTime;
+  }
+
+  document.getElementById('timer').innerHTML = Math.round(this.remainTime / 1000);
+
+};
+
+Game.prototype.updateScore = function updateScore(gameSize) {
+  var i;
+
+  // Score calculation & display
+  for (i = 0; i < this.boxes.length; i++) {
+    if (this.boxes[i].center.x > (gameSize.x / 2)) {
+      this.players[0].score = this.players[0].score + (this.boxes[i].center.x - (gameSize.x / 2)) / this.boxes[i].size.x;
+      document.getElementById('scoreLeft').innerHTML = (this.players[0].score) * 100;
+    }
+
+    if (this.boxes[i].center.x < (gameSize.x / 2)) {
+      this.players[1].score = this.players[1].score + ((gameSize.x / 2) - this.boxes[i].center.x) / this.boxes[i].size.x;
+      document.getElementById('scoreRight').innerHTML = (this.players[1].score) * 100;
+    }
   }
 };
 
@@ -60,17 +104,27 @@ Game.prototype.draw = function draw(screen, gameSize) {
 
   // Draw players
   for (i = 0; i < this.players.length; i++) {
-    drawRect(screen, this.players[i]);
+    drawRect(screen, this.players[i], '#a5866f');
   }
 
   // Draw boxes
   for (i = 0; i < this.boxes.length; i++) {
-    drawRect(screen, this.boxes[i]);
+    if (this.boxes[i].type === 'bomb') {
+      drawRect(screen, this.boxes[i], '#2ea583');
+    }
+
+    if (this.boxes[i].type === 'rock') {
+      drawRect(screen, this.boxes[i], '#f23030');
+    }
+
+    if (this.boxes[i].succeed === true) {
+      drawRect(screen, this.boxes[i], '#ffff00');
+    }
   }
 
   // Draw weapons
   for (i = 0; i < this.weapons.length; i++) {
-    drawRect(screen, this.weapons[i]);
+    drawRect(screen, this.weapons[i], '#ffff00');
   }
 };
 
@@ -91,6 +145,8 @@ var Player = function Player(game, gameSize, centerX, keys, side) {
   this.keys = keys;
   this.side = side;
   this.armed = true;
+  this.speed = 6;
+  this.score = 0;
 };
 
 Player.prototype.update = function update() {
@@ -99,11 +155,11 @@ Player.prototype.update = function update() {
   // Move
   if (this.keyboarder.isDown(this.keys.down)) {
     if (this.center.y < this.gameSize.y - this.size.y / 2 - 3) {
-      this.center.y += 4;
+      this.center.y += this.speed;
     }
   } else if (this.keyboarder.isDown(this.keys.up)) {
     if (this.center.y > 0 + this.size.y / 2 + 3) {
-      this.center.y -= 4;
+      this.center.y -= this.speed;
     }
   }
 
@@ -131,11 +187,14 @@ Player.prototype.update = function update() {
 /* BOX CONSTRUCTOR
    ================================================================= */
 
-var Box = function Box(game, gameSize, centerY) {
+var Box = function Box(game, gameSize, centerY, type, movable) {
   this.game = game;
   this.gameSize = gameSize;
   this.size = { x: 16, y: 16 };
   this.center = { x: gameSize.x / 2, y: centerY };
+  this.type = type;
+  this.movable = movable;
+  this.succeed = false;
 };
 
 Box.prototype.update = function update() {};
@@ -146,13 +205,15 @@ Box.prototype.update = function update() {};
 var Weapon = function Weapon(player, center, side, gameSize) {
   this.center = center;
   this.gameSize = gameSize;
-  this.size = { x: 10, y: 10 };
+  this.size = { x: 4, y: 4 };
   this.side = side;
-  this.speed = 6;
+  this.speed = 8;
   this.player = player;
 };
 
-Weapon.prototype.update = function update(weapons, index) {
+Weapon.prototype.update = function update(weapons, index, boxes) {
+  var i;
+
   if (this.side === 'right') {
     // Move weapon left
     if (this.center.x >= 0 + this.size.x / 2 + 3) {
@@ -163,6 +224,23 @@ Weapon.prototype.update = function update(weapons, index) {
     if (this.center.x <= 0 + this.size.x / 2 + 3) {
       this.player.armed = true;
       this.destroy(weapons, index);
+    }
+
+    // Action when collite with boxes
+    for (i = 0; i < boxes.length; i++) {
+      var coliteBoxesRight = colliding(this, boxes[i]);
+      if (coliteBoxesRight) {
+        if (boxes[i].movable === true) {
+          boxes[i].center.x -= 16;
+          if (boxes[i].center.x <= (5 * (boxes[i].size.x / 2))) {
+            boxes[i].movable = false;
+            boxes[i].succeed = true;
+          }
+        }
+
+        this.destroy(weapons, index);
+        this.player.armed = true;
+      }
     }
   }
 
@@ -176,6 +254,23 @@ Weapon.prototype.update = function update(weapons, index) {
     if (this.center.x >= this.gameSize.x - this.size.x / 2 - 3) {
       this.player.armed = true;
       this.destroy(weapons, index);
+    }
+
+    // Action when collite with boxes
+    for (i = 0; i < boxes.length; i++) {
+      var coliteBoxesLeft = colliding(this, boxes[i]);
+      if (coliteBoxesLeft) {
+        if (boxes[i].movable === true) {
+          boxes[i].center.x += 16;
+          if (boxes[i].center.x >= this.gameSize.x - (5 * (boxes[i].size.x / 2))) {
+            boxes[i].movable = false;
+            boxes[i].succeed = true;
+          }
+        }
+
+        this.destroy(weapons, index);
+        this.player.armed = true;
+      }
     }
   }
 };
@@ -222,14 +317,38 @@ var Keyboarder = function Keyboarder() {
    ================================================================= */
 
 // **drawRect()** draws passed body as a rectangle to `screen`, the drawing context.
-var drawRect = function drawRect(screen, body) {
-  screen.fillStyle = '#000000';
+var drawRect = function drawRect(screen, body, color) {
+  screen.fillStyle = color;
   screen.fillRect(body.center.x - body.size.x / 2, body.center.y - body.size.y / 2,
                   body.size.x, body.size.y);
 
-  screen.strokeStyle = '#ffffff';
-  screen.strokeRect(body.center.x - body.size.x / 2, body.center.y - body.size.y / 2,
-                  body.size.x, body.size.y);
+  // screen.strokeStyle = color;
+  // screen.lineWidth = 1;
+  // screen.strokeRect(body.center.x - body.size.x / 2, body.center.y - body.size.y / 2,
+  //                 body.size.x, body.size.y);
+};
+
+/* COLLISION
+   ================================================================= */
+
+// **colliding()** returns true if two passed bodies are colliding.
+// The approach is to test for five situations.  If any are true,
+// the bodies are definitely not colliding.  If none of them
+// are true, the bodies are colliding.
+// 1. b1 is the same body as b2.
+// 2. Right of `b1` is to the left of the left of `b2`.
+// 3. Bottom of `b1` is above the top of `b2`.
+// 4. Left of `b1` is to the right of the right of `b2`.
+// 5. Top of `b1` is below the bottom of `b2`.
+
+var colliding = function(b1, b2) {
+  return !(
+    b1 === b2 ||
+      b1.center.x + b1.size.x / 2 < b2.center.x - b2.size.x / 2 ||
+      b1.center.y + b1.size.y / 2 < b2.center.y - b2.size.y / 2 ||
+      b1.center.x - b1.size.x / 2 > b2.center.x + b2.size.x / 2 ||
+      b1.center.y - b1.size.y / 2 > b2.center.y + b2.size.y / 2
+  );
 };
 
   /* START GAME

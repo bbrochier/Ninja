@@ -11,6 +11,8 @@ var Player = function Player(game, gameSize, centerX, keys, side) {
   this.keys = keys;
   this.side = side;
   this.armed = true;
+  this.speed = 6;
+  this.score = 0;
 };
 
 Player.prototype.update = function update() {
@@ -19,11 +21,11 @@ Player.prototype.update = function update() {
   // Move
   if (this.keyboarder.isDown(this.keys.down)) {
     if (this.center.y < this.gameSize.y - this.size.y / 2 - 3) {
-      this.center.y += 4;
+      this.center.y += this.speed;
     }
   } else if (this.keyboarder.isDown(this.keys.up)) {
     if (this.center.y > 0 + this.size.y / 2 + 3) {
-      this.center.y -= 4;
+      this.center.y -= this.speed;
     }
   }
 

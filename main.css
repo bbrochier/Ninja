@@ -1,9 +1,41 @@
 body {
   background-color: #000;
+  color: #fff;
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
 }
+
+header {
+  width: 400px;
+  height: 50px;
+  margin: 30px auto 0 auto;
+  position: relative;
+}
+
+.score {
+  position: absolute;
+  bottom: 10px;
+}
+
+#scoreRight {
+  right: 0;
+}
+
+#scoreLeft {
+  left: 0;
+}
+
+#timer {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  font-size: 40px;
+  line-height: 40px;
+  transform: translateX(-50%);
+}
+
 canvas {
-  background-color: #000;
+  background-color: #0e233f;
   border: 1px solid #fff;
-  margin: 50px auto;
+  margin: 0 auto;
   display:block;
 }
