@@ -10,11 +10,11 @@ var Game = function Game() {
   var i;
 
   // Timer
-  this.gameTime = 9 * 1000; /* miliseconds */
+  this.gameTime = 90; /* seconds */
   this.startTime = new Date().getTime();
   this.currentTime = this.startTime;
-  this.remainTime = this.gameTime;
-  this.endTime = this.startTime + this.gameTime;
+  this.remainTime = (this.gameTime * 1000);
+  this.endTime = this.startTime + (this.gameTime * 1000);
 
   // Create Players
   this.players = [];
@@ -36,7 +36,8 @@ var Game = function Game() {
   }
 
   // Weapons
-  this.weapons = [];
+  this.weaponsRight = [];
+  this.weaponsLeft = [];
 
   //Tick
   var tick = function tick() {
@@ -61,8 +62,12 @@ Game.prototype.update = function update() {
     this.players[i].update();
   }
 
-  for (i = 0; i < this.weapons.length; i++) {
-    this.weapons[i].update(this.weapons, i, this.boxes);
+  for (i = 0; i < this.weaponsRight.length; i++) {
+    this.weaponsRight[i].update(this.weaponsRight, i, this.boxes);
+  }
+
+  for (i = 0; i < this.weaponsLeft.length; i++) {
+    this.weaponsLeft[i].update(this.weaponsLeft, i, this.boxes);
   }
 
   // UpdateTime
@@ -119,11 +124,21 @@ Game.prototype.draw = function draw(screen, gameSize) {
   }
 
   // Draw weapons
-  for (i = 0; i < this.weapons.length; i++) {
-    drawRect(screen, this.weapons[i], '#ffff00');
+  for (i = 0; i < this.weaponsRight.length; i++) {
+    drawRect(screen, this.weaponsRight[i], '#ffff00');
+  }
+
+  for (i = 0; i < this.weaponsLeft.length; i++) {
+    drawRect(screen, this.weaponsLeft[i], '#ffff00');
   }
 };
 
-Game.prototype.addWeapon = function(weapon) {
-  this.weapons.push(weapon);
+Game.prototype.addWeapon = function(weapon, side) {
+  if (side === 'right') {
+    this.weaponsRight.push(weapon);
+  }
+
+  if (side === 'left') {
+    this.weaponsLeft.push(weapon);
+  }
 };

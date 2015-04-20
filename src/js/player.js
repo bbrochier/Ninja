@@ -42,7 +42,7 @@ Player.prototype.update = function update() {
 
     if (this.armed === true) {
       var weapon = new Weapon(this, { x: weaponCenterX, y: this.center.y }, this.side, this.gameSize);
-      this.game.addWeapon(weapon);
+      this.game.addWeapon(weapon, this.side);
       this.armed = false;
     }
   }

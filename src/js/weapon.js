@@ -37,8 +37,8 @@ Weapon.prototype.update = function update(weapons, index, boxes) {
           }
         }
 
-        this.destroy(weapons, index);
         this.player.armed = true;
+        this.destroy(weapons, index);
       }
     }
   }
@@ -67,8 +67,8 @@ Weapon.prototype.update = function update(weapons, index, boxes) {
           }
         }
 
-        this.destroy(weapons, index);
         this.player.armed = true;
+        this.destroy(weapons, index);
       }
     }
   }
