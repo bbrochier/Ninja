@@ -58,8 +58,6 @@ var Game = function Game() {
 Game.prototype.update = function update() {
   var _this = this;
   var i;
-  this.players[0].score = 0;
-  this.players[1].score = 0;
 
   // Call update on every body
   for (i = 0; i < this.players.length; i++) {
@@ -86,15 +84,17 @@ Game.prototype.update = function update() {
 
 Game.prototype.updateScore = function updateScore(gameSize) {
   var i;
+  this.players[0].score = 0;
+  this.players[1].score = 0;
 
   // Score calculation & display
   for (i = 0; i < this.boxes.length; i++) {
-    if (this.boxes[i].center.x > (gameSize.x / 2)) {
+    if (this.boxes[i].center.x >= (gameSize.x / 2)) {
       this.players[0].score = this.players[0].score + (this.boxes[i].center.x - (gameSize.x / 2)) / this.boxes[i].size.x;
       document.getElementById('scoreLeft').innerHTML = (this.players[0].score) * 100;
     }
 
-    if (this.boxes[i].center.x < (gameSize.x / 2)) {
+    if (this.boxes[i].center.x <= (gameSize.x / 2)) {
       this.players[1].score = this.players[1].score + ((gameSize.x / 2) - this.boxes[i].center.x) / this.boxes[i].size.x;
       document.getElementById('scoreRight').innerHTML = (this.players[1].score) * 100;
     }
