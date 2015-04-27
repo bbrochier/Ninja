@@ -40,11 +40,10 @@ var drawRect = function drawRect(screen, body, color) {
   screen.fillStyle = color;
   screen.fillRect(body.center.x - body.size.x / 2, body.center.y - body.size.y / 2,
                   body.size.x, body.size.y);
+};
 
-  // screen.strokeStyle = color;
-  // screen.lineWidth = 1;
-  // screen.strokeRect(body.center.x - body.size.x / 2, body.center.y - body.size.y / 2,
-  //                 body.size.x, body.size.y);
+var drawImg = function drawBox(screen, body, img) {
+  screen.drawImage(img, body.center.x - body.size.x / 2, body.center.y - body.size.y / 2, body.size.x, body.size.y);
 };
 
 /* COLLISION

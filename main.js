@@ -13,6 +13,13 @@ var Game = function Game() {
   var j = 0;
   var i;
 
+  // Images
+  this.images = {};
+  this.images.boxes = new Image();
+  this.images.boxes.src = 'src/img/box.gif';
+  this.images.wall = new Image();
+  this.images.wall.src = 'src/img/wall.gif';
+
   // Timer
   this.gameTime = 90; /* seconds */
   this.startTime = new Date().getTime();
@@ -115,11 +122,11 @@ Game.prototype.draw = function draw(screen, gameSize) {
   // Draw boxes
   for (i = 0; i < this.boxes.length; i++) {
     if (this.boxes[i].type === 'bomb') {
-      drawRect(screen, this.boxes[i], '#2ea583');
+      drawImg(screen, this.boxes[i], this.images.boxes);
     }
 
     if (this.boxes[i].type === 'rock') {
-      drawRect(screen, this.boxes[i], '#f23030');
+      drawImg(screen, this.boxes[i], this.images.wall);
     }
 
     if (this.boxes[i].succeed === true) {
@@ -336,11 +343,10 @@ var drawRect = function drawRect(screen, body, color) {
   screen.fillStyle = color;
   screen.fillRect(body.center.x - body.size.x / 2, body.center.y - body.size.y / 2,
                   body.size.x, body.size.y);
+};
 
-  // screen.strokeStyle = color;
-  // screen.lineWidth = 1;
-  // screen.strokeRect(body.center.x - body.size.x / 2, body.center.y - body.size.y / 2,
-  //                 body.size.x, body.size.y);
+var drawImg = function drawBox(screen, body, img) {
+  screen.drawImage(img, body.center.x - body.size.x / 2, body.center.y - body.size.y / 2, body.size.x, body.size.y);
 };
 
 /* COLLISION
